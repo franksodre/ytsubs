@@ -1,0 +1,35 @@
+<!DOCTYPE>
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ytsubs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.7"></script>
+  </head>
+</head>
+<html>
+  <body>
+    @include './partials/header.html'
+    <section class="flex align-center justify-center w-full my-8">
+      <form class="space-x-4 w-full flex justify-center"
+          hx-post="/"
+          hx-target="#result"
+          hx-on::before-request="snipper.hidden = false"
+          hx-on::after-request="snipper.hidden = true"
+          hx-swap="innerHTML"
+        >
+        <input name="url" placeholder="Enter a youtube link to download subs" class="p-2 ring-2 ring-slate-700 w-96"></input>
+        <button class="uppercase text-sm bg-slate-700 text-zinc-100 p-2 px-4 rounded">subling</button>
+      </form>
+    </section>
+    <div id="snipper" hidden>Loading...</div>
+    <section class="flex justify-center space-y-4 capitalize">
+      <div id="result">
+      </div>
+    </section>
+  </body>
+</html>

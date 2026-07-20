@@ -1,0 +1,6 @@
+1. Order the files are displayed in `ls` order
+2. Id every file should have an id
+
+link -> create_subs -> get_files -> struct subtitle
+
+for longs file it takes too long, maybe it should deliver the ones that are already done.
