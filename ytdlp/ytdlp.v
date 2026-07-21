@@ -10,6 +10,7 @@ pub fn create_sub(url string) os.Result {
 		"--no-warnings"
 		// "--write-subs"
 		"--write-auto-subs",
+		"--cookies", config.cookies
 		// "--sub-langs","en",
 		"-o", config.save_formatted, url
 	])
