@@ -25,7 +25,8 @@ RUN apt update && \
   # curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
   # chmod a+rx /usr/bin/yt-dlp && \
   rm -rf /var/lib/apt/lists/* && \
-  chmod +x /app/bin/yt-dlp
+
+RUN chmod a+rx /app/bin/yt-dlp
 
 COPY --from=build /app/ytsubs /app/ytsubs
 EXPOSE 8080
