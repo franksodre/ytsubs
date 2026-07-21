@@ -1,15 +1,13 @@
 module main
 
+// import strings
+// import os
+// import ytdlp
+// import config
+// import arrays
+
 import net.urllib
-import strings
-import json
-import os
-
-import ytdlp
-import config
-import arrays
-
-// file_size, file_name, file_ext
+import json2
 
 @[soa]
 struct Subtitle {
@@ -24,7 +22,7 @@ fn validate_url(url string) !urllib.URL {
 }
 
 fn handle_video(metadata string) []Subtitle {
-	subtitle := json.decode([]Subtitle, metadata) or {
+	subtitle := json2.decode[[]Subtitle](metadata) or {
 		eprintln("Failed to decode json, error: ${err}")
 		exit(1)
 	}
@@ -36,12 +34,6 @@ fn handle_video(metadata string) []Subtitle {
 fn view_html_download(filepath string, content ?string) string {
 	return '<a href="/subs/${filepath}" download>${content or {''}}</a>'
 }
-
-@[inline]
-fn view_html_failed(content ?string) string {
-	return ''
-}
-
 
 // I could just pass the id from b once that's the only thing being use.
 // and this is a pretty niche function.
