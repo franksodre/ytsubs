@@ -11,7 +11,7 @@ pub fn create_sub(url string) os.Result {
 		"--skip-download",
 		"--no-warnings"
 		"--write-auto-subs",
-		"--cookies-from-browser"
+		"--cookies-from-browser", "chrome"
 		// "--cookies", config.cookies
 		"-o", config.save_formatted, url
 	])
@@ -25,7 +25,7 @@ pub fn get_video_metadata(url string) string {
 		"--ignore-errors"
 		"--no-warnings"
 		"--flat-playlist"
-		"--cookies-from-browser"
+		"--cookies-from-browser", "chrome"
 		// "--cookies", config.cookies
 		"-O", "%(.{id,title,original_url})#j,",
 		url
