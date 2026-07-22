@@ -6,7 +6,6 @@ module main
 // import config
 // import arrays
 
-import net.urllib
 import json2
 
 @[soa]
@@ -15,10 +14,6 @@ struct Subtitle {
 	title					string
 	original_url 	string
 	size 					u64
-}
-
-fn validate_url(url string) !urllib.URL {
-	return urllib.parse(url) or { return error("error: malformed url") }
 }
 
 fn handle_video(metadata string) []Subtitle {
