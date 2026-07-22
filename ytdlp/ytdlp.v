@@ -13,7 +13,7 @@ pub fn create_sub(url string) os.Result {
 		"--no-warnings"
 		"--write-auto-subs",
 		// "--cookies-from-browser", "chrome"
-		"--cookies", "${cookie}"
+		"--cookies", cookie
 		"-o", config.save_formatted, url
 	])
 	return res
@@ -28,7 +28,7 @@ pub fn get_video_metadata(url string) string {
 		"--no-warnings"
 		"--flat-playlist"
 		// "--cookies-from-browser", "chrome"
-		"--cookies", "${cookie}"
+		"--cookies", cookie
 		"-O", "%(.{id,title,original_url})#j,",
 		url
 	])
