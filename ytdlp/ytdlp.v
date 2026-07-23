@@ -10,6 +10,8 @@ pub fn create_sub(url string) os.Result {
 		"yt-dlp",
 		"--skip-download",
 		"--no-warnings"
+		"--ignore-errors"
+		// "format", "best"
 		"--write-auto-subs",
 		// "--cookies-from-browser", "chrome"
 		"--cookies", "${config.workdir}/cookies.txt"
@@ -22,8 +24,8 @@ pub fn create_sub(url string) os.Result {
 pub fn get_video_metadata(url string) string {
 	res := os.exec([
 		"yt-dlp"
-		// "--ignore-errors"
-		// "--no-warnings"
+		"--ignore-errors"
+		"--no-warnings"
 		"--flat-playlist"
 		// "--cookies-from-browser", "chrome"
 		"--cookies", "${config.workdir}/cookies.txt"
