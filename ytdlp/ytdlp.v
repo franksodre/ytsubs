@@ -11,7 +11,7 @@ pub fn create_sub(url string) os.Result {
 		"--skip-download",
 		"--no-warnings"
 		"--ignore-errors"
-		// "format", "best"
+		"format", "best"
 		"--write-auto-subs",
 		// "--cookies-from-browser", "chrome"
 		"--cookies", "${config.workdir}/cookies.txt"
