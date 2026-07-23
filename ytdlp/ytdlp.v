@@ -11,7 +11,7 @@ pub fn create_sub(url string) os.Result {
 		"--skip-download",
 		"--no-warnings"
 		"--ignore-errors"
-		"--remote-componentes ejs:github"
+		"--remote-components ejs:github"
 		"--write-auto-subs",
 		"--cookies", "${config.workdir}/cookies.txt"
 		"-o", config.save_formatted, url
@@ -26,7 +26,7 @@ pub fn get_video_metadata(url string) string {
 		"--ignore-errors"
 		"--no-warnings"
 		"--flat-playlist"
-		"--remote-componentes ejs:github"
+		"--remote-components ejs:github"
 		"--cookies", "${config.workdir}/cookies.txt"
 		"-O", "%(.{id,title,original_url})#j,",
 		url
