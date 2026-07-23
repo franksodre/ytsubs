@@ -27,6 +27,7 @@ FROM ubuntu:26.04 AS run
 
 RUN apt-get update && apt-get install -y \
     curl \
+    7zip \
     ca-certificates \
     python3-pip \
     ffmpeg \
