@@ -36,7 +36,11 @@ pub fn get_video_metadata(url string) string {
 	return res.output
 }
 
-// fn read_cookies() string {
-// 	cookie := os.read_file(config.workdir + "/assets/cookies.txt")or {eprintln(err); exit(1)}
-// 	return cookie
-// }
+pub fn list_formats(url string) string {
+	res := os.exec([
+		"yt-dlp"
+		"--list-formats"
+		url
+	])
+	return res.output
+}
