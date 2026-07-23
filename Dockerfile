@@ -18,12 +18,19 @@ RUN /opt/v/v -prod /app/ -o ytsubs
 
 FROM ubuntu:26.04 AS run
 
-RUN apt update && \
-  apt install -y --no-install-recommends --no-install-suggests ffmpeg python3 ca-certificates curl && \
-  update-ca-certificates && \
-  curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
-  chmod a+rx /usr/bin/yt-dlp && \
-  rm -rf /var/lib/apt/lists/*
+# RUN apt update && \
+#   apt install -y --no-install-recommends --no-install-suggests ffmpeg python3 ca-certificates curl && \
+#   update-ca-certificates && \
+#   curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/bin/yt-dlp && \
+#   chmod a+rx /usr/bin/yt-dlp && \
+#   rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    deno \
+    ffmpeg \
+    && pip3 install --break-system-packages yt-dlp[default]
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . .
