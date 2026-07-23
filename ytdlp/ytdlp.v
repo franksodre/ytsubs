@@ -4,13 +4,11 @@ import os
 import config
 
 pub fn create_sub(url string) os.Result {
-	// "--write-subs"
-	// "--sub-langs","en",
 	res := os.exec([
 		"yt-dlp",
 		"--skip-download",
-		"--no-warnings"
-		"--ignore-errors"
+		// "--no-warnings"
+		// "--ignore-errors"
 		"--remote-components", "ejs:github"
 		"--write-auto-subs",
 		"--cookies", "${config.workdir}/cookies.txt"
@@ -23,8 +21,8 @@ pub fn create_sub(url string) os.Result {
 pub fn get_video_metadata(url string) string {
 	res := os.exec([
 		"yt-dlp"
-		"--ignore-errors"
-		"--no-warnings"
+		// "--ignore-errors"
+		// "--no-warnings"
 		"--flat-playlist"
 		"--remote-components", "ejs:github"
 		"--cookies", "${config.workdir}/cookies.txt"
@@ -34,11 +32,12 @@ pub fn get_video_metadata(url string) string {
 	return res.output
 }
 
-// pub fn list_formats(url string) string {
-// 	res := os.exec([
-// 		"yt-dlp"
-// 		"--list-formats"
-// 		url
-// 	])
-// 	return res.output
-// }
+pub fn list_formats(url string) string {
+	println("LIST OF FORMATS::")
+	res := os.exec([
+		"yt-dlp"
+		"--list-formats"
+		url
+	])
+	return res.output
+}
