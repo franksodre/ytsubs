@@ -27,7 +27,7 @@ pub fn get_video_metadata(url string) string {
 		"--ignore-errors"
 		"--no-warnings"
 		"--flat-playlist"
-		"format", "best"
+		"--format", "best"
 		// "--cookies-from-browser", "chrome"
 		"--cookies", "${config.workdir}/cookies.txt"
 		"-O", "%(.{id,title,original_url})#j,",
