@@ -9,11 +9,11 @@ pub fn create_sub(url string) os.Result {
 	res := os.exec([
 		"yt-dlp",
 		"--skip-download",
-		"--no-warnings"
-		"--ignore-errors"
+		// "--no-warnings"
+		// "--ignore-errors"
 		"--format", "best"
 		"--write-auto-subs",
-		"--remote-components ejs:github"
+		// "--cookies-from-browser", "chrome"
 		"--cookies", "${config.workdir}/cookies.txt"
 		"-o", config.save_formatted, url
 	])
@@ -24,11 +24,11 @@ pub fn create_sub(url string) os.Result {
 pub fn get_video_metadata(url string) string {
 	res := os.exec([
 		"yt-dlp"
-		"--ignore-errors"
-		"--no-warnings"
+		// "--ignore-errors"
+		// "--no-warnings"
 		"--flat-playlist"
 		"--format", "best"
-		"--remote-components ejs:github"
+		// "--cookies-from-browser", "chrome"
 		"--cookies", "${config.workdir}/cookies.txt"
 		"-O", "%(.{id,title,original_url})#j,",
 		url
@@ -36,11 +36,11 @@ pub fn get_video_metadata(url string) string {
 	return res.output
 }
 
-// pub fn list_formats(url string) string {
-// 	res := os.exec([
-// 		"yt-dlp"
-// 		"--list-formats"
-// 		url
-// 	])
-// 	return res.output
-// }
+pub fn list_formats(url string) string {
+	res := os.exec([
+		"yt-dlp"
+		"--list-formats"
+		url
+	])
+	return res.output
+}
