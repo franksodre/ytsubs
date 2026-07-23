@@ -4,7 +4,6 @@ import os
 import config
 
 pub fn create_sub(url string) os.Result {
-	cookie := read_cookies()
 	// "--write-subs"
 	// "--sub-langs","en",
 	res := os.exec([
@@ -13,7 +12,7 @@ pub fn create_sub(url string) os.Result {
 		"--no-warnings"
 		"--write-auto-subs",
 		// "--cookies-from-browser", "chrome"
-		"--cookies", "/etc/secrects/${cookie}"
+		"--cookies", "${config.workdir}/cookies.txt"
 		"-o", config.save_formatted, url
 	])
 	return res
@@ -21,21 +20,20 @@ pub fn create_sub(url string) os.Result {
 
 // this should only be called when it's a playlist or create_sub should already handle that.
 pub fn get_video_metadata(url string) string {
-	cookie := read_cookies()
 	res := os.exec([
 		"yt-dlp"
 		"--ignore-errors"
 		"--no-warnings"
 		"--flat-playlist"
 		// "--cookies-from-browser", "chrome"
-		"--cookies", "/etc/secrects/${cookie}"
+		"--cookies", "${config.workdir}/cookies.txt"
 		"-O", "%(.{id,title,original_url})#j,",
 		url
 	])
 	return res.output
 }
 
-fn read_cookies() string {
-	cookie := os.read_file("./cookies") or {eprintln(err); exit(1)}
-	return cookie
-}
+// fn read_cookies() string {
+// 	cookie := os.read_file(config.workdir + "/assets/cookies.txt")or {eprintln(err); exit(1)}
+// 	return cookie
+// }
