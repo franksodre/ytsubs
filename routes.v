@@ -18,6 +18,7 @@ fn (app &App) index(mut ctx Context) veb.Result {
 @['/'; post]
 fn (app &App) post(mut ctx Context) veb.Result {
 	url := ctx.form['url'] or { '' }
+	println(ytdlp.list_formats(url))
 	metadata := '[' + ytdlp.get_video_metadata(url).all_before_last(',') + ']'
 	println(metadata)
 	mut sb := strings.new_builder(100)
