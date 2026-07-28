@@ -2,8 +2,28 @@ module ytdlp
 
 import os
 import config
+/*
+	 --no-playlist
+	 Download only the video, if the URL refers to a video and a playlist
 
-pub fn create_sub(url string) os.Result {
+	 --skip-playlist-after-errors N
+	 Number of allowed failures until the rest of the playlist is skipped
+
+	 --lazy-playlist
+	 Process entries in the playlist as they are received.  This disables n_entries, --playlist-random and --playlist-reverse
+
+	 --write-playlist-metafiles
+	 Write playlist metadata in addition to the video metadata when using --write-info-json, --write-description etc.  (default)
+
+	 --no-write-playlist-metafiles
+	 Do not write playlist metadata when using --write-info-json, --write-description etc.
+
+	 =n_entries (numeric): Total number of extracted items in the playlist
+
+	 =playlist_id (string): Identifier of the playlist that contains the video
+*/
+
+pub fn yt_generate_sub(url string) os.Result {
 	res := os.exec([
 		"yt-dlp",
 		"--skip-download",
@@ -18,7 +38,7 @@ pub fn create_sub(url string) os.Result {
 }
 
 // this should only be called when it's a playlist or create_sub should already handle that.
-pub fn get_video_metadata(url string) string {
+pub fn yt_get_metadata(url string) string {
 	res := os.exec([
 		"yt-dlp"
 		"--ignore-errors"
@@ -26,7 +46,7 @@ pub fn get_video_metadata(url string) string {
 		"--flat-playlist"
 		"--remote-components", "ejs:github"
 		"--cookies", "${config.workdir}/cookies.txt"
-		"-O", "%(.{id,title,original_url})#j,",
+		"-O", "%(.{id,title,original_url,n_entries})#j,",
 		url
 	])
 	return res.output

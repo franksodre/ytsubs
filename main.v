@@ -3,7 +3,6 @@ module main
 import veb
 import config
 
-@[noinit]
 pub struct App {
 	veb.StaticHandler
 }

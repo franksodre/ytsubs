@@ -1,0 +1,8 @@
+TODO: Sanatize and parse input properly.
+The [ls] is unnecessary, once you properly make sure the sub was downloaded you should have in time the location.
+The same is applies if is a playlist.
+So the path where the subs are going to be stored should be known.
+
+I'll use some structure to quickly pick the files(but I pretty much already
+know which file is...so it probably won't be neccessary) and I can organize
+them by folders maybe the playlists...
