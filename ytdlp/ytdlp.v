@@ -23,7 +23,8 @@ import config
 	 =playlist_id (string): Identifier of the playlist that contains the video
 */
 
-pub fn yt_generate_sub(url string) os.Result {
+pub fn yt_generate_sub(url string, path ?string) os.Result {
+	p := path or { config.save_formatted }
 	res := os.exec([
 		"yt-dlp",
 		"--skip-download",
@@ -32,7 +33,7 @@ pub fn yt_generate_sub(url string) os.Result {
 		"--remote-components", "ejs:github"
 		"--write-auto-subs",
 		"--cookies", "${config.workdir}/cookies.txt"
-		"-o", config.save_formatted, url
+		"-o", p, url
 	])
 	return res
 }

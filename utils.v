@@ -1,11 +1,5 @@
 module main
 
-// import strings
-// import os
-// import ytdlp
-// import config
-// import arrays
-
 import json2
 
 @[soa]
@@ -27,7 +21,7 @@ fn handle_video(metadata string) []Subtitle {
 
 @[inline]
 fn view_html_download(filepath string, content ?string) string {
-	return '<a href="/subs/${filepath}" download>${content or {''}}</a>'
+	return '<a href="/subs/${filepath}" download class="text-semibold hover:underline">${content or {''}}</a>'
 }
 
 // I could just pass the id from b once that's the only thing being use.
