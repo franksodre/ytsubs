@@ -11,6 +11,7 @@ pub:
 	title 			string
 	url 				string @[json: 'original_url']
 	n_entries 	int @[omitempty] // This is just because I'm not yet decoding Data.
+	playlist_id string
 }
 
 pub struct Data {
@@ -29,6 +30,7 @@ pub fn (d Data) get_sub_metadata() ![]Metadata {
 
 // returns succeeded generated subs metadata and failed ones
 pub fn (m []Metadata) generate(path ?string) !([]Metadata, []Metadata) {
+	// This is slower than calling the [playlist mode] directly.
 	f := m.filter(ytdlp.yt_generate_sub(it.url, path).exit_code != 0) // I should unwrap it in here
 	data := diff_meta(m, f) // TODO(franksodrelima): test this
 	return data, f

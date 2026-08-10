@@ -47,7 +47,7 @@ pub fn yt_get_metadata(url string) string {
 		"--flat-playlist"
 		"--remote-components", "ejs:github"
 		"--cookies", "${config.workdir}/cookies.txt"
-		"-O", "%(.{id,title,original_url,n_entries})#j,",
+		"-O", "%(.{id,title,original_url,n_entries,playlist_id})#j,",
 		url
 	])
 	return res.output

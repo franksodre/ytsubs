@@ -1,8 +1,33 @@
 TODO: Sanatize and parse input properly.
 The [ls] is unnecessary, once you properly make sure the sub was downloaded you should have in time the location.
 The same is applies if is a playlist.
-So the path where the subs are going to be stored should be known.
+So the path where the subs are going to be stored should be known. [x]
 
-I'll use some structure to quickly pick the files(but I pretty much already
-know which file is...so it probably won't be neccessary) and I can organize
-them by folders maybe the playlists...
+I'll use some structure to quickly pick the files [doing]
+I can organize them by folders maybe the playlists...[x]
+
+
+For handling playlists just identify when you have them and then call generate
+for each video on the playlist.
+
+If it's on cache but the [path] doesn't exist fallback to [generate]
+
+
+
+// I cannot depend in generate to create the path 'cause is too unpredictable or just have more control of it.
+// I'm assuming that the downloads always succeeds which is dumb cause it's like that.
+// but if I handle that I also need to handle the creating dir phase.
+// That's why it should be separated.
+// I shouldn't assume it will just work instead I should be doing the right opposite.
+// subs, _ := metadata.generate(fpath) or { return ctx.html("<div id='error'>Error2<div>") }
+
+
+// @@note:
+// I shouldn't differentiate playlist_id from id what determines if it's a
+// playlist or a single video is it's entries
+
+// This approach is also reasonable:
+	// mut cached_path := app.lookup().get_path(metadata[0].id) or {eprintln(err); exit(1)}
+	//
+	// if n_entries > 1 {
+	// 	cached_path = app.lookup().get_path(metadata[0].playlist_id) or {eprintln(err); exit(1)}

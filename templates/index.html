@@ -10,10 +10,10 @@
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script src="https://unpkg.com/htmx.org@2.0.7"></script>
 
-    <script
-    src="https://cdn.jsdelivr.net/npm/hyperscript.org@0.9.93/dist/_hyperscript.min.js"
-    integrity="sha384-/6HsqTiz02YfFBUhzTwlH/yxe68DhfnkdHiWytM3nxAzs/yvG+3FZY0f4KLnNoov"
-    crossorigin="anonymous"></script>
+    <!-- <script -->
+    <!-- src="https://cdn.jsdelivr.net/npm/hyperscript.org@0.9.93/dist/_hyperscript.min.js" -->
+    <!-- integrity="sha384-/6HsqTiz02YfFBUhzTwlH/yxe68DhfnkdHiWytM3nxAzs/yvG+3FZY0f4KLnNoov" -->
+    <!-- crossorigin="anonymous"></script> -->
   </head>
 </head>
 <html>
@@ -21,6 +21,11 @@
     @include './partials/header.html'
     <section class="flex align-center justify-center w-full my-8">
       <form class="space-x-4 w-full flex justify-center"
+          hx-post="/"
+          hx-target="#result"
+          hx-on::before-request="snipper.hidden = false"
+          hx-on::after-request="snipper.hidden = true"
+          hx-swap="innerHTML"
         >
         <input
           name="url" 
@@ -34,21 +39,15 @@
         <button 
           class="uppercase text-sm bg-slate-700 text-zinc-100 p-2 px-4
           rounded"
-          _="on click if #url.value is '' then put 'Please enter a valid URL' into #alert otherwise log #url end"
           >
           subling
         </button>
       </form>
     </section>
-    <div id="alert" hidden>Loading...</div>
+    <div id="snipper" hidden>Loading...</div>
       <section class="flex space-y-4 capitalize">
       <div id="result" class="border-l-lg border-slate-600 px-4">
       </div>
     </section>
   </body>
 </html>
-          <!-- hx-post="/"
-          hx-target="#alert"
-          hx-on::before-request="snipper.hidden = false"
-          hx-on::after-request="snipper.hidden = true"
-          hx-swap="innerHTML" -->
