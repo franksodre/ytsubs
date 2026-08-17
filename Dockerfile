@@ -3,7 +3,7 @@ FROM ubuntu:26.04 AS build
 RUN apt update && \
   apt install -y --no-install-recommends --no-install-suggests git build-essential ca-certificates && \
   update-ca-certificates && \
-  apt install sqlite3-dev && \
+  apt install libsqlite3-dev && \
   rm -rf /var/lib/apt/lists/*
 
 RUN git clone --depth=1 https://github.com/vlang/v /opt/v && \
