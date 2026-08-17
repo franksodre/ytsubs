@@ -18,7 +18,8 @@ fn render_one_sub(path string, lst []ytdlp.Metadata) string {
 	if file_path != [] {
 		sb.write_string('<div>')
 		// Give the correct path for correct download
-		sb.write_string(view_html_download(os.base(file_path[0]), lst.first().title))
+		base := os.base(file_path[0])
+		sb.write_string(view_html_download(base, base))
 		sb.write_string('</div><br><br>')
 		return sb.str()
 	}
@@ -73,6 +74,7 @@ fn (app &App) post(mut ctx Context) veb.Result {
 		mut cached_path := app.lookup().get_path(metadata[0].playlist_id) or {eprintln(err); exit(1)}
 		// If is cached
 		if cached_path != '' {
+			println("let it cache1")
 			return ctx.html(render_playlist(cached_path, []ytdlp.Metadata{}))
 		}
 
@@ -86,6 +88,7 @@ fn (app &App) post(mut ctx Context) veb.Result {
 		mut cached_path := app.lookup().get_path(metadata[0].id) or {eprintln(err); exit(1)}
 
 		if cached_path != '' {
+			println("let it cache2")
 			return ctx.html(render_one_sub(cached_path, []ytdlp.Metadata{}))
 		}
 		subs, _ := metadata.generate(fpath) or { return ctx.html("<div id='error'>Error2<div>") }
