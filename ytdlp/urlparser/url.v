@@ -24,11 +24,8 @@ pub fn parse_url(raw_url string) !URL {
 }
 
 // url : urllib.URL
-// It invalidates this type of playlists: 
-// https://www.youtube.com/watch?v=xxYJONmXE8w&list=RDxxYJONmXE8w&start_radio=1&rv=xxYJONmXE8w
-// TODO()
 pub fn (url URL) is_playlist() bool {
-	if !url.parsed.path.contains('playlist') || url.query['list'].len <= 0 {
+	if url.query['list'].len <= 0 {
 		return false
 	}
 	return true
