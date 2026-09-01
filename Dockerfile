@@ -31,6 +31,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     python3-pip \
     ffmpeg \
+    jq \
     && pip3 install --break-system-packages yt-dlp[default] && \
     rm -rf /var/lib/apt/lists/*
 RUN curl -fsSL https://deno.land/install.sh | sh

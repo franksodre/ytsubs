@@ -31,3 +31,29 @@ If it's on cache but the [path] doesn't exist fallback to [generate]
 	//
 	// if n_entries > 1 {
 	// 	cached_path = app.lookup().get_path(metadata[0].playlist_id) or {eprintln(err); exit(1)}
+
+
+----
+
+For the cache not only the path should be saved but also the info if so info
+should just hold the dest path too along side with the other metadata and the
+cache should have info as entity.
+But what about info playlist?
+
+If a sub takes no time to be generated it shouldn't be cached caching is only
+for high demanding requests.
+
+TODO:
+  Make a proper cache module to handle caching logic that can really become
+  complicated so a caching module is mandatory. [cache module]
+
+  Make a proper render module because rendering should be handled cleanly and
+  right now it's everywhere. [Render]
+
+  LATER:
+    Do a logging system even if minimal but only when the major things like
+    error handling and rendering are tidy. This should eliminate the current
+    eprintln calls used to print debbug. [Logging]
+
+
+Shorts might not have video_id it might be called something else.

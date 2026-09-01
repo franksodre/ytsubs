@@ -1,0 +1,53 @@
+// @disgusting in all the things that disgust me this is the worst and
+// sam altman he really give me the creepies
+module main
+
+import veb
+
+import config
+import ytdlp
+import ytdlp.urlparser as u
+import entity {Info, InfoPlaylist}
+
+const is_valid_url_msg = 'field URL cannot be empty. Please enter a valid YT URL'
+const video_id_msg = 'cannot get video information. Please check the URL'
+
+@['/'; post]
+fn (app &App) post(mut ctx Context) veb.Result {
+	raw_url := ctx.form['url'] or { return ctx.request_error(is_valid_url_msg) }
+	url := u.parse_url(raw_url) or { return ctx.html("<div>${err}</div>") }
+
+	if url.is_playlist() {
+		return app.post_playlist(mut ctx)
+	}
+
+	id := url.get_video_id() or {
+		eprintln(err)
+		return ctx.request_error(video_id_msg)
+	}
+
+	mut item, ok := app.cache().get_item[Info](id)
+	if ok {
+		println("HIT")
+		return ctx.html(render_one_sub(item))
+	}
+	path := create_save_dir()
+
+	info := ytdlp.extract_info(url.raw_url) or {
+	 eprintln(err)
+	 return ctx.html("<div id='error'>This Error will get better 2<div>") 
+	}
+
+	if info == []Info{} {
+		return ctx.html("<div>Nothing found</div>")
+	}
+
+	ytdlp.download(url.raw_url, path) or {
+		eprintln(err)
+		return ctx.html("<div id='error'>Error2<div>") 
+	}
+	info.first().path = path
+	app.cache().add_item[Info](id, info.first()) or {eprintln("Faild to cache item"); exit(1)}
+
+	return ctx.html(render_one_sub(info.first()))
+}

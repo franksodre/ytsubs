@@ -2,10 +2,9 @@ module urlparser
 
 import net.urllib
 
-// All of this might not be that accurate, I didn't search youtube's url format yet.
+/// All of this might not be that accurate, I didn't search youtube's url format yet. !important
 
-// TOOD(franksodre): unescape all the url first
-// TOOD(franksodre): Do a yturl struct to hold changes in the url
+// TODO(franksodre): Check for id length !important
 
 pub struct URL {
 pub:
@@ -31,39 +30,40 @@ pub fn (url URL) is_playlist() bool {
 	return true
 }
 
-// TODO(franksodre): Check for id length
 pub fn (url URL) get_video_id() !string {
-	if !url.parsed.path.contains('watch') {
-		// invalid URL
+	// what if both
+	if !url.parsed.path.contains('watch') && !url.parsed.path.contains('shorts') {
 		return error('Invalid Youtube URL format or incomplete.')
 	}
-	id := url.query['v']
-	if id.len == 1 {
-		return id[0]
+	
+	// @seelater
+	id := if url.parsed.path.contains('shorts') {
+		url.parsed.path[1..].split('/')[1] or { '' } // this might fail if path.len == 1
+	} else {
+		url.query['v'][0] or { '' }
+	}
+	if id == '' {
+		return error('No video id was found.')
 	} 
-	// invalid URL
-	return error('No video id was found.')
+	println(id)
+
+	return id
 }
 
-// TODO(franksodre): Check for id length
 pub fn (url URL) get_playlist_id() !string {
 	if !url.is_playlist() {
-		// invalid URL
 		return error('Unable to get playlist id. Not a playlist.')
 	}
 	id := url.query['list']
 	if id.len == 0 {
-		// invalid URL
 		return error('No playlist id was found.')
 	}
 	if id.len > 1 {
-		// invalid URL
 		return error('Multiple ids outside a playlist is not supported')
 	}
 	return id[0]
 }
 
-// Returns the id whether is a playlist or video but not both
 pub fn (url URL) get_id() !string {
 	if !url.is_playlist() {
 		println('[URL]: Getting video id.')
@@ -73,4 +73,5 @@ pub fn (url URL) get_id() !string {
 	return url.get_playlist_id()!
 }
 
+// @unimplemented
 fn is_valid_url() {}

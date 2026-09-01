@@ -1,37 +1,37 @@
 module repo
 import os
+import entity { Info, InfoPlaylist }
 
 pub struct UseCase {
 pub:
-	lookup	ILookupRepo @[required]
-}
-
-pub interface ILookupRepo {
-	lookup(code string) ![]Lookup
-	add_key(Lookup) !
+	cache Repository
 }
 
 // The code is the youtube id
-pub fn (u UseCase) get_path(code string) !string {
-	lk := u.lookup.lookup(code)!
-	if lk.len != 0 {
-		return lk.first().path
+pub fn (u UseCase) get_item[T](code string) (T, bool) {
+	$if T is entity.Info {
+		item := u.cache.lookup[entity.Info](code, lookup_info)
+		if item != Info{} {
+			return item, true
+		}
+		return T{}, false
+	} $else {
+		item := u.cache.lookup[entity.InfoPlaylist](code, lookup_info_playlist)
+		if item != InfoPlaylist{} {
+			return item, true
+		}
+		return T{}, false
 	}
-	return ''
 }
 
-pub fn (u UseCase) add_path(code string, path string) ! {
-	lk := u.lookup.lookup(code)!
-	if lk.len != 0 {
-		return
+pub fn (u UseCase) add_item[T](code string, item T) ! {
+	$if T is entity.Info {
+		info := u.cache.lookup[entity.Info](code, lookup_info)
+		if info != Info{} { return }
+		u.cache.add_key[Info](item, add_key_info)!
+	} $else {
+		info := u.cache.lookup[entity.InfoPlaylist](code, lookup_info_playlist)
+		if info != InfoPlaylist{} { return }
+		u.cache.add_key[InfoPlaylist](item, add_key_playlist)!
 	}
-
-	u.lookup.add_key(Lookup{code: code, path: path})!
-	return
 }
-
-// if !os.exists(path) {
-// 	eprintln("Path doesn't exists, path: ${path}")
-// 	return error()
-// }
-//

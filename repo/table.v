@@ -1,53 +1,61 @@
 module repo
 
-import db.sqlite
 import orm
+import entity {Info, InfoPlaylist}
 
-// Entity
-pub struct Lookup {
-	code 	string @[primary; unique]
-	path 	string
+struct Repository {
+	db 	orm.Connection
 }
 
-// Connection
-pub struct LookupRepo {
-	db	orm.Connection
+// be careful with the .fisrt() calls
+
+pub fn new_repo(db orm.Connection) Repository {
+	return Repository{db: db}
 }
 
-pub fn migrate(db orm.Connection) ! { 
+pub fn migrate(db orm.Connection) ! {
 	sql db {
-		create table Lookup
+		create table Info
+		create table InfoPlaylist
 	}!
 }
 
-pub fn lookup(db orm.Connection) LookupRepo { 
-	return LookupRepo{
-		db: db
-	}
+fn (r Repository) lookup[T] (code string, query fn (orm.Connection, string) T) T {
+	return query(r.db, code)
 }
 
-pub fn (l LookupRepo) add_key(lookup Lookup) ! {
-	sql l.db {
-		insert lookup into Lookup
-	} or { return err }
+fn (r Repository) add_key[T] (item T, query fn (orm.Connection, T) !) ! {
+	return query(r.db, item)
 }
 
-pub fn (l LookupRepo) set_key(code string, val string) ! { 
-	sql l.db {
-		update Lookup set code = val where code == code
-	} or { return err }
+// This can't return an array
+// @known calling first might panic cause the info can be empty 
+fn lookup_info(db orm.Connection, id string) Info {
+	info := sql db {
+		select from Info where videoid == id
+		order by id desc limit 1
+	} or { [] }
+	return info[0] or { Info{} }
 }
 
-pub fn (l LookupRepo) get_table_by_code(code string) ![]Lookup {
-	lk := sql l.db {
-		select path from Lookup where code == code
-	} or { return err }
-	return lk // it should be unique btw, so check for that in useCases
+// This can't return an array
+// @known calling first might panic cause the info can be empty 
+fn lookup_info_playlist(db orm.Connection, id string) InfoPlaylist {
+	info := sql db {
+		select from InfoPlaylist where playlist_id == id
+		order by id desc limit 1
+	} or { [] }
+	return info[0] or { InfoPlaylist{} }
 }
 
-pub fn (l LookupRepo) lookup(code string) ![]Lookup {
-	lk := sql l.db {
-		select from Lookup where code == code
-	} or { return err }
-	return lk
+fn add_key_info(db orm.Connection, item Info) ! {
+	sql db {
+		insert item into Info
+	}!
+}
+
+fn add_key_playlist(db orm.Connection, item InfoPlaylist) ! {
+	sql db {
+		insert item into InfoPlaylist
+	}!
 }

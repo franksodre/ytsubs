@@ -4,9 +4,12 @@ import veb
 import config
 
 // /subs/:id
-@['/subs/:filename'; get]
-fn (app &App) download(mut ctx Context, filename string) veb.Result {
-		file := config.save_dir + filename
+@['/download/sub'; get]
+fn (app &App) download(mut ctx Context) veb.Result {
+		dir := ctx.query['d'] or { '' }
+		name := ctx.query['name'] or {''}
+
+		file := config.save_dir + dir + '/' + name
 		ctx.set_content_type("text/vtt")
 		return ctx.file(file)
 }

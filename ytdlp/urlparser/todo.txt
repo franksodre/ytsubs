@@ -3,3 +3,5 @@
 Handle url format if it's bad provide errors
 Extract some useful info from the url
 Provide useful methods for all the url aspects necessary
+
+# Sanitizer

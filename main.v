@@ -17,10 +17,15 @@ pub mut:
 	title 	string
 }
 
-fn (app &App) lookup() repo.UseCase {
+fn (app &App) cache() repo.UseCase {
 	return repo.UseCase{
-		lookup: repo.lookup(app.db)
+		cache: repo.new_repo(app.db)
 	}
+}
+
+@['/'; get]
+fn (app &App) index(mut ctx Context) veb.Result {
+	return ctx.html($tmpl('./templates/index.html'))
 }
 
 fn main() {
