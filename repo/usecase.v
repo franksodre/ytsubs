@@ -1,5 +1,4 @@
 module repo
-import os
 import entity { Info, InfoPlaylist }
 
 pub struct UseCase {

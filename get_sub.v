@@ -4,9 +4,8 @@ module main
 
 import veb
 
-import config
 import ytdlp
-import ytdlp.urlparser as u
+import ytdlp.urlparser
 import entity {Info, InfoPlaylist}
 import os
 
@@ -16,7 +15,7 @@ const video_id_msg = 'cannot get video information. Please check the URL'
 @['/'; post]
 fn (app &App) post(mut ctx Context) veb.Result {
 	raw_url := ctx.form['url'] or { return ctx.request_error(is_valid_url_msg) }
-	url := u.parse_url(raw_url) or { return ctx.html("<div>${err}</div>") }
+	url := urlparser.parse_url(raw_url) or { return ctx.html("<div>${err}</div>") }
 
 	if url.is_playlist() {
 		return app.post_playlist(mut ctx)

@@ -10,6 +10,6 @@ fn create_save_dir() string {
 }
 
 // @tmp
-fn view_html_download(dir string, filename string, value string) string {
-	return '<a href="download/sub?d=${dir}&name=${filename}" download class="text-semibold hover:underline">${value}</a>'
-}
+// fn view_html_download(dir string, filename string, value string) string {
+// 	return '<a href="download/sub?d=${dir}&name=${filename}" download class="text-semibold hover:underline">${value}</a>'
+// }

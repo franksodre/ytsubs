@@ -4,7 +4,6 @@ module ytdlp
 
 import os
 import config
-import urlparser as u
 
 // Don't like it but yeah...
 fn build_args(url string, path string) []string {

@@ -2,10 +2,6 @@ module main
 
 import os
 import entity { Info, InfoPlaylist }
-import context {
-	todo 
-	cause
-}
 pub struct Render{}
 
 pub fn new_render() Render {return Render{}}
