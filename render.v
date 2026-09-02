@@ -1,73 +1,61 @@
 module main
 
 import os
-import strings
 import entity { Info, InfoPlaylist }
 import context {
 	todo 
 	cause
 }
-
-pub type InfoRender = Info | InfoPlaylist
-
 pub struct Render{}
-/*
 
-
-r := new_render()
-r.display()
-
-*/
-
-pub fn new_render() /*Render */ {}
-pub fn (r Render) display[T](info InfoRender) /*T*/ {
-	$if info is Info {/*render_sub_info*/ }
-	$if info is InfoPlaylist { /*render_sub_info_playlist*/}
+pub fn new_render() Render {return Render{}}
+pub fn (r Render) display[T](item T) string {
+	$if T is Info {
+		return render_sub_info(item) 
+	} $else { return render_sub_info_playlist(item) }
 }
 
-fn render_sub_info() {}
-fn render_sub_info_playlist() {}
-
-fn render_one_sub(info Info) string {
-	mut sb := strings.new_builder(50)
-
+fn render_sub_info(info Info) string {
 	if info.path == '' {
-		return 'No subs available'
+		return "There are no subs for this video."
+	}
+	// @known the format should be dynamic
+	filepath := os.glob('${info.path}*.vtt') or {
+		eprintln(err)
+		return "There are no subs for this video."
+	}
+	// should check bounds?
+	if filepath.len == 0 {
+		return "There are no subs for this video."
 	}
 
-	file_path := os.glob(info.path + '*.vtt') or {
-		eprintln(err)
-		return 'Nothing to render'
-	}
-	if file_path != [] {
-		sb.write_string('<div>')
-		path := info.path.split('/').reverse()[1]
-		filename := os.file_name(file_path[0])
-		sb.write_string(view_html_download(path, filename, filename))
-		sb.write_string('</div><br><br>')
-		return sb.str()
-	}
-	return 'No subs available'
+	dir, filename, ext := os.split_path(filepath[0])
+	return '
+		<div><a href="download/sub?d=${dir.split('/').last()}&name=${filename + ext}"
+		download="${filename}" class="text-semibold hover:underline">${filename.all_before_last('.')}</a></div>
+		<br><br>
+		'
 }
 
-fn render_playlist(info_playlist InfoPlaylist) string {
-	mut sb := strings.new_builder(50)
-
-	files := os.glob(info_playlist.path + '*.vtt') or {
+fn render_sub_info_playlist(info_playlist InfoPlaylist) string {
+	mut s := ""
+	if info_playlist.path == '' {
+		return "There are no subs for this video."
+	}
+	// @known the format should be dynamic
+	filepaths := os.glob('${info_playlist.path}*.vtt') or {
 		eprintln(err)
-		return 'Nothing to render'
+		return "There are no subs for this video."
 	}
-	if files.len == 0 {
-		return "No subs available"
-	}
-
-	for _, f in files {
-		path := info_playlist.path.split('/')[info_playlist.path.len - 2]
-		filename := os.file_name(f)
-		sb.write_string('<div>')
-		sb.write_string(view_html_download(path,filename, filename))
-		sb.write_string('</div><br><br>')
+	if filepaths.len == 0 {
+		return "There are no subs for this video."
 	}
 
-	return sb.str()
+	for _, path in filepaths {
+		dir, filename, ext := os.split_path(path)
+		s += '<div><a href="download/sub?d=${dir.split('/').last()}&name=${filename+ ext}"
+		download="${filename} "class="text-semibold hover:underline">${filename.all_before_last('.')}</a></div>
+		<br><br> '
+	}
+	return s
 }

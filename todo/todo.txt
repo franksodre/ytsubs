@@ -57,3 +57,6 @@ TODO:
 
 
 Shorts might not have video_id it might be called something else.
+
+
+current state: Video https://www.youtube.com/watch?v=qs8gULOZslo&pp=0gcJCRoMAYcqIYzv can't download

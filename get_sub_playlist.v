@@ -19,9 +19,10 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 		return ctx.request_error('cannot get Playlist information. Please check the URL')
 	}
 
+	r := new_render()
 	mut item, ok := app.cache().get_item[InfoPlaylist](id)
 	if ok {
-		return ctx.html(render_playlist(item))
+		return ctx.html(r.display(item))
 	}
 
 	path := create_save_dir()
@@ -41,5 +42,5 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	info_playlist.first().path = path
 	app.cache().add_item[InfoPlaylist](id, info_playlist.first()) or {eprintln("Faild to cache item"); exit(1)}
 
-	return ctx.html(render_playlist(info_playlist.first()))
+	return ctx.html(r.display(info_playlist.first()))
 }
