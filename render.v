@@ -1,6 +1,7 @@
 module main
 
 import os
+import encoding.base64
 import entity { Info, InfoPlaylist }
 pub struct Render{}
 
@@ -26,8 +27,9 @@ fn render_sub_info(info Info) string {
 	}
 
 	dir, filename, ext := os.split_path(filepath[0])
+	name := base64.url_encode_str(filename + ext) 
 	return '
-		<div><a href="download/sub?d=${dir.split('/').last()}&name=${filename + ext}"
+		<div><a href="download/sub?d=${dir.split('/').last()}&name=${name}"
 		download="${filename}" class="text-semibold hover:underline">${filename.all_before_last('.')}</a></div>
 		<br><br>
 		'
