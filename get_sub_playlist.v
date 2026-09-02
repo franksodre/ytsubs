@@ -6,6 +6,7 @@ import ytdlp
 import os
 import ytdlp.urlparser as u
 import entity { InfoPlaylist, Info }
+import time
 
 fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	raw_url := ctx.form['url'] or { return ctx.request_error(is_valid_url_msg) }
@@ -38,10 +39,13 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 		return ctx.html("<div>Nothing found</div>")
 	}
 
+mut	watch := time.new_stopwatch()
+	watch.start()
 	ytdlp.download(url.raw_url, path) or {
 		eprintln(err)
 		return ctx.html("<div id='error'>Error2<div>") 
 	}
+	println(watch.elapsed().str())
 	info_playlist.first().path = path
 	app.cache().add_item[InfoPlaylist](id, info_playlist.first()) or {eprintln("Faild to cache item"); exit(1)}
 

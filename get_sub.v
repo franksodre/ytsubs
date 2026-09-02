@@ -9,6 +9,8 @@ import ytdlp.urlparser as u
 import entity {Info, InfoPlaylist}
 import os
 
+import time
+
 const is_valid_url_msg = 'field URL cannot be empty. Please enter a valid YT URL'
 const video_id_msg = 'cannot get video information. Please check the URL'
 
@@ -43,10 +45,14 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	if info.len == 0 {
 		return ctx.html("<div>Nothing found</div>")
 	}
+
+	mut watch := time.new_stopwatch()
+	watch.start()
 	ytdlp.download(url.raw_url, path) or {
 		eprintln(err)
 		return ctx.html("<div id='error'>Error2<div>") 
 	}
+	println(watch.elapsed().str())
 	info.first().path = path
 	app.cache().add_item[Info](id, info.first()) or {eprintln("Faild to cache item"); exit(1)}
 
