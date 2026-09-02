@@ -3,6 +3,7 @@ FROM ubuntu:26.04 AS build
 RUN apt update && \
   apt install -y --no-install-recommends --no-install-suggests git build-essential ca-certificates && \
   update-ca-certificates && \
+  apt install sqlite3-dev
   rm -rf /var/lib/apt/lists/*
 
 RUN git clone --depth=1 https://github.com/vlang/v /opt/v && \
@@ -26,12 +27,12 @@ FROM ubuntu:26.04 AS run
 #   rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \
+    jq \
     curl \
     7zip \
     ca-certificates \
     python3-pip \
     ffmpeg \
-    jq \
     && pip3 install --break-system-packages yt-dlp[default] && \
     rm -rf /var/lib/apt/lists/*
 RUN curl -fsSL https://deno.land/install.sh | sh
