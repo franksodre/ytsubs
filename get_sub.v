@@ -30,6 +30,8 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	mut item, ok := app.cache().get_item[Info](id)
 	// tmp
 	if ok && !os.is_dir_empty(item.path) {
+		eprintln("HIT!")
+		eprintln("CACHED")
 		return ctx.html(r.display(item))
 	}
 
@@ -38,7 +40,7 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	 eprintln(err)
 	 return ctx.html("<div id='error'>This Error will get better 2<div>") 
 	}
-	if info == []Info{} {
+	if info.len == 0 {
 		return ctx.html("<div>Nothing found</div>")
 	}
 	ytdlp.download(url.raw_url, path) or {

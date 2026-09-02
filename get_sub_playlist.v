@@ -3,6 +3,7 @@ module main
 import veb
 
 import ytdlp
+import os
 import ytdlp.urlparser as u
 import entity { InfoPlaylist, Info }
 
@@ -21,7 +22,9 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 
 	r := new_render()
 	mut item, ok := app.cache().get_item[InfoPlaylist](id)
-	if ok {
+	if ok && !os.is_dir_empty(item.path) {
+		eprintln("HIT!")
+		eprintln("CACHED")
 		return ctx.html(r.display(item))
 	}
 
@@ -31,7 +34,7 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	 return ctx.html("<div id='error'>This Error will get better 2<div>") 
 	}
 
-	if info_playlist == []InfoPlaylist{} {
+	if info_playlist.len == 0 {
 		return ctx.html("<div>Nothing found</div>")
 	}
 
