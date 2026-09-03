@@ -32,8 +32,8 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	mut item, ok := app.cache().get_item[Info](id)
 	// tmp
 	if ok && !os.is_dir_empty(item.path) {
-		eprintln("HIT!")
-		eprintln("CACHED")
+		// eprintln("HIT!")
+		// eprintln("CACHED")
 		return ctx.html(r.display(item))
 	}
 
@@ -48,9 +48,11 @@ fn (app &App) post(mut ctx Context) veb.Result {
 
 	mut watch := time.new_stopwatch()
 	watch.start()
-	ytdlp.download(url.raw_url, path) or {
+	typ, err := ytdlp.download(url.raw_url, path)
+	// TOOD(franksodre): put errors in a kind of global context so it can be used by Render to display it.
+	// for now we just print it.
+	if typ == .some_failed {
 		eprintln(err)
-		return ctx.html("<div id='error'>Error2<div>") 
 	}
 	println(watch.elapsed().str())
 	info.first().path = path
