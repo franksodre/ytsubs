@@ -16,6 +16,9 @@ const video_id_msg = 'cannot get video information. Please check the URL'
 
 @['/'; post]
 fn (app &App) post(mut ctx Context) veb.Result {
+	mut watch := time.new_stopwatch()
+
+	format := ctx.form['format']
 	raw_url := ctx.form['url'] or { return ctx.request_error(is_valid_url_msg) }
 	url := u.parse_url(raw_url) or { return ctx.html("<div>${err}</div>") }
 
@@ -32,8 +35,8 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	mut item, ok := app.cache().get_item[Info](id)
 	// tmp
 	if ok && !os.is_dir_empty(item.path) {
-		// eprintln("HIT!")
-		// eprintln("CACHED")
+		eprintln("HIT!")
+		eprintln("CACHED")
 		return ctx.html(r.display(item))
 	}
 
@@ -43,20 +46,21 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	 return ctx.html("<div id='error'>This Error will get better 2<div>") 
 	}
 	if info.len == 0 {
-		return ctx.html("<div>Nothing found</div>")
+		return ctx.html("<div class='text-amber-300 font-medium'><span
+		class='bg-amber-300 text-white font-bold px-2 rounded mr-2'>!</span>Nothing
+		found. Video doesn't exits or Private</div>")
 	}
 
-	mut watch := time.new_stopwatch()
 	watch.start()
-	typ, err := ytdlp.download(url.raw_url, path)
+	_, err := ytdlp.download(ytdlp.DownloadParams{url: url.raw_url, path: path, format: format})
+	eprintln(err)
 	// TOOD(franksodre): put errors in a kind of global context so it can be used by Render to display it.
 	// for now we just print it.
-	if typ == .some_failed {
-		eprintln(err)
-	}
-	println(watch.elapsed().str())
+	println("Downloading: ${watch.elapsed().str()}") // measuring
 	info.first().path = path
-	app.cache().add_item[Info](id, info.first()) or {eprintln("Faild to cache item"); exit(1)}
+	info.first().format = format
+	println(format)
+	app.cache().add_item[Info](id, info.first()) or {eprintln(err)}
 
 	return ctx.html(r.display(info.first()))
 }

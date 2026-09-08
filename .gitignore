@@ -29,3 +29,4 @@ modules/
 
 # Ignore save files
 save/*
+todo/*

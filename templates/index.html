@@ -20,28 +20,35 @@
   <body>
     @include './partials/header.html'
     <section class="flex align-center justify-center w-full my-8">
-      <form class="space-x-4 w-full flex justify-center"
+      <form class="flex items-end space-x-4"
           hx-post="/"
           hx-target="#result"
           hx-on::before-request="snipper.hidden = false"
           hx-on::after-request="snipper.hidden = true"
           hx-swap="innerHTML"
         >
-        <input
-          name="url" 
-          type="url"
-          id="url"
-          required
-          placeholder="Enter a youtube link to download subs"
-          class="p-2 ring-2 ring-slate-700 w-96"
-        >
-        </input>
-        <button 
-          class="uppercase text-sm bg-slate-700 text-zinc-100 p-2 px-4
-          rounded"
-          >
-          subling
-        </button>
+        <div class="">
+          <div class="flex flex-col space-y-2">
+            <div>
+              @include './partials/formats.html'
+            </div>
+            <input
+              name="url" 
+              type="url"
+              id="url"
+              required
+              placeholder="Enter a youtube link to download subs"
+              class="p-2 ring-2 ring-slate-700 w-96"
+            />
+            </div>
+        </div>
+          <button 
+            class="uppercase text-sm bg-slate-700 text-zinc-100 p-2 px-4
+            rounded w-fit h-fit text-center"
+            type="submit"
+            >
+            subling
+          </button>
       </form>
     </section>
     <div id="snipper" hidden>Loading...</div>

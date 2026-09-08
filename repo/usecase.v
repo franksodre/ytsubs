@@ -26,7 +26,7 @@ pub fn (u UseCase) get_item[T](code string) (T, bool) {
 pub fn (u UseCase) add_item[T](code string, item T) ! {
 	$if T is entity.Info {
 		info := u.cache.lookup[entity.Info](code, lookup_info)
-		if info != Info{} { return }
+		if info != Info{} { eprintln(info); return }
 		u.cache.add_key[Info](item, add_key_info)!
 	} $else {
 		info := u.cache.lookup[entity.InfoPlaylist](code, lookup_info_playlist)

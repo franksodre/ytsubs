@@ -26,8 +26,8 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	r := new_render()
 	mut item, ok := app.cache().get_item[InfoPlaylist](id)
 	if ok && !os.is_dir_empty(item.path) {
-		// eprintln("HIT!")
-		// eprintln("CACHED")
+		eprintln("HIT!")
+		eprintln("CACHED")
 		return ctx.html(r.display(item))
 	}
 
@@ -40,19 +40,19 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	println("Info extraction: ${watch.elapsed().str()}")
 
 	if info_playlist.len == 0 {
-		return ctx.html("<div>Nothing found</div>")
+		return ctx.html("<div class='text-amber-500 font-medium'><span
+		class='bg-amber-300 text-white font-bold px-2 rounded mr-2'>!</span>Nothing
+		found. Playlist empty or not visible</div>")
 	}
 
 	watch.start()
-	typ, err := ytdlp.download(url.raw_url, path)
+	_, err := ytdlp.download(ytdlp.DownloadParams{url: url.raw_url, path: path}) // @known let's ignore the errors for now
+	eprintln(err)
 	// TOOD(franksodre): put errors in a kind of global context so it can be used by Render to display it.
 	// for now we just print it.
-	if typ == .some_failed {
-		eprintln(err)
-	}
 	println("Downloading: ${watch.elapsed().str()}")
 	info_playlist.first().path = path
-	app.cache().add_item[InfoPlaylist](id, info_playlist.first()) or {eprintln("Faild to cache item"); exit(1)}
+	app.cache().add_item[InfoPlaylist](id, info_playlist.first()) or {eprintln(err); exit(1)}
 
 	return ctx.html(r.display(info_playlist.first()))
 }

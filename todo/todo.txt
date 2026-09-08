@@ -60,3 +60,31 @@ Shorts might not have video_id it might be called something else.
 
 
 current state: Video https://www.youtube.com/watch?v=qs8gULOZslo&pp=0gcJCRoMAYcqIYzv can't download
+
+
+If one video in a playlist is unavailable but other are it shouldn't stop the app execution, it's not an error.
+summary: If at least one video is available in a playlist it should return it's sub.
+
+
+#[This is on my own computer]
+Downloading is the most expensive task in the app
+Extraction info is not that expensive
+a playlist with id == PLZ-1Hz3X12eU with "7" videos(items) takes takes in average "32s", ~4-5s per video.
+the same playlist takes about "4s" to extract all the necessary information.
+
+![important]
+It's really important to be careful because some videos or videos can simply
+change, they might no longer exist, they may change title and having those
+things cached it's a problem. The app has to have a revalidation strategy.
+Right now I only check if the dir exist or not but I should also check for the
+files if doesn't exist download it again.
+Also I should think in the deleting strategies.
+I might consider partial update but it really far from now.
+
+
+
+1. the filename problem, where I can get the right filepath to download and
+show.
+2. the database cache, where if one a video is in a playlist it's counted even
+outside of it so with that do you return the item or you download and cache
+again but this time separated.

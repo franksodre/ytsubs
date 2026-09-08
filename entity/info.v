@@ -1,6 +1,6 @@
 module entity 
 
-@[json: 'Info']
+@[json: 'Info'; table: 'Info']
 pub struct Info {  
 pub:
 	id				int @[primary; sql: serial; json: '-']
@@ -9,17 +9,19 @@ pub:
 	title			string	
 	duration	string  
 	url				string 	
+	language  string
 pub mut:
 	path	string
+	format		string
 }
 
-@[json: 'InfoPlaylist']
+@[json: 'InfoPlaylist'; table: 'InfoPlaylist']
 pub struct InfoPlaylist {  
 pub:
 	id							int			@[primary; sql: serial; json: '-']
 	playlist_id 		string 	@[json: 'playlist_id']
 	playlist_title	string
-	video_info			[]Info   @[fkey: 'parent_id']
+	video_info			[]Info   @[fkey: 'parent_id'; json: 'video']
 pub mut:
 	path	string
 }
