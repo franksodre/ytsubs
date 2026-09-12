@@ -20,8 +20,8 @@ pub fn migrate(db orm.Connection) ! {
 	}!
 }
 
-fn (r Repository) lookup[T] (code string, query fn (orm.Connection, string) T) T {
-	return query(r.db, code)
+fn (r Repository) lookup[T] (code string, format string, query fn (orm.Connection, string, string) T) T {
+	return query(r.db, code, format)
 }
 
 fn (r Repository) add_key[T] (item T, query fn (orm.Connection, T) !) ! {
@@ -30,9 +30,9 @@ fn (r Repository) add_key[T] (item T, query fn (orm.Connection, T) !) ! {
 
 // This can't return an array
 // @known calling first might panic cause the info can be empty 
-fn lookup_info(db orm.Connection, id string) Info {
+fn lookup_info(db orm.Connection, id string, sub_format string) Info {
 	info := sql db {
-		select from Info where videoid == id
+		select from Info where videoid == id && format == sub_format
 		order by id desc limit 1
 	} or { [] }
 	return info[0] or { Info{} }
@@ -40,9 +40,9 @@ fn lookup_info(db orm.Connection, id string) Info {
 
 // This can't return an array
 // @known calling first might panic cause the info can be empty 
-fn lookup_info_playlist(db orm.Connection, id string) InfoPlaylist {
+fn lookup_info_playlist(db orm.Connection, id string, sub_format string) InfoPlaylist {
 	info := sql db {
-		select from InfoPlaylist where playlist_id == id
+		select from InfoPlaylist where playlist_id == id && video_format == sub_format
 		order by id desc limit 1
 	} or { [] }
 	return info[0] or { InfoPlaylist{} }

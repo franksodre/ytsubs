@@ -71,5 +71,6 @@ fn parse_output_result(output string) ([]ErrorType, []string) {
 			states << .all_failed
 		}
 	}
+	println(lines)
 	return states, msg
 }

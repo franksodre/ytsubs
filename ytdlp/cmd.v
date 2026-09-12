@@ -7,12 +7,16 @@ import config
 
 // Don't like it but yeah...
 fn build_args(url string, format string, path string) string {
-	cmd := '
-		yt-dlp --ignore-errors --no-warnings --skip-download --remote-components
-		ejs:github --write-auto-subs --sub-format ${format} --convert-subs
-		${format} --cookies ${config.workdir}/cookies.txt -o "${path +
-		"%(title)s.%(ext)s"}" "${url}"'
-		return cmd
+	cmd := 'yt-dlp \\
+	--ignore-errors \\
+	--no-warnings \\
+	--skip-download \\
+	--remote-components ejs:github \\
+	--write-auto-subs \\
+	--sub-format ${format} \\
+	--convert-subs ${format} \\
+	--cookies ${config.workdir}/cookies.txt -o "${path + "%(title)s.%(ext)s"}" "${url}"'
+	return cmd
 }
 
 // We don't want erros during extraction

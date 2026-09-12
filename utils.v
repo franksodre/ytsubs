@@ -9,7 +9,20 @@ fn create_save_dir() string {
 	return path
 }
 
-// @tmp
-// fn view_html_download(dir string, filename string, value string) string {
-// 	return '<a href="download/sub?d=${dir}&name=${filename}" download class="text-semibold hover:underline">${value}</a>'
-// }
+// TODO(franksodre): remove reverse calls
+// returns the filename without it's extension
+fn get_filename(filename string) string {
+	mut count := 0
+	mut s := ""
+	title := os.file_name(filename)
+	for k, c in title.reverse() {
+		if c == `.` {
+			count++
+			if count == 2 {
+				s = title.reverse()[k..]
+				break;
+			}
+		}
+	}
+	return s.reverse()
+}

@@ -1,18 +1,31 @@
 module ytdlp
-// module ytdlp
-//
-// fn diff_meta(a []Metadata, b []Metadata) []Metadata {
-// 	mut m := map[string]bool{}
-// 	for _, s in b {
-// 		m[s.id] = true
-// 	}
-//
-// 	diff := a.filter(!m[it.id])
-// 	return diff
-// }
-//
-// @[inline]
-// fn is_playlist(url string) bool {
-// 	if url.contains('list') { return true }
-// 	return false
-// }
+import os
+
+// @notice: Not sure it should use globs or the filename
+// if the filename is used the from should removed
+
+// This function can be _from_to or just _to
+/// The filename cannnot contain an extension
+fn convert_sub_from_to(filename string, to string) string {
+	ext := os.file_ext(filename)
+	cmd := 'ffmpeg -i *.${ext} ${filename}.${to}'
+	return cmd
+}
+
+@[inline]
+pub fn convert_to_ass(filename string) {
+	cmd := convert_sub_from_to(filename, "ass")
+	os.execute(cmd)
+}
+
+@[inline]
+pub fn convert_to_vtt(filename string) {
+	cmd := convert_sub_from_to(filename, "vtt")
+	os.execute(cmd)
+}
+
+@[inline]
+pub fn convert_to_srt(filename string) {
+	cmd := convert_sub_from_to(filename, "srt")
+	os.execute(cmd)
+}

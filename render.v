@@ -1,15 +1,22 @@
 module main
 
-import os
 import encoding.base64
 import entity { Info, InfoPlaylist }
+import os
+import time
 
-pub struct Render{}
-pub fn new_render() Render {return Render{}}
+pub struct Render {}
+
+pub fn new_render() Render {
+	return Render{}
+}
+
 pub fn (r Render) display[T](item T) string {
 	$if T is Info {
-		return render_sub_info(item) 
-	} $else { return render_sub_info_playlist(item) }
+		return render_sub_info(item)
+	} $else {
+		return render_sub_info_playlist(item)
+	}
 }
 
 fn render_sub_info(info Info) string {
@@ -17,9 +24,8 @@ fn render_sub_info(info Info) string {
 		return "There are no subs for this video."
 	}
 
-	println(info)
-	// TODO(franksodre): make the file format dynamic [vtt, srt, ass]
-	filepath := os.glob('${info.path}*.${info.format}') or {
+	pattern := '${info.path}*.${info.format}'
+	filepath := os.glob(pattern) or {
 		eprintln(err)
 		return "There are no subs for this video."
 	}
@@ -49,16 +55,22 @@ fn render_sub_info_playlist(info_playlist InfoPlaylist) string {
 	if info_playlist.path == '' {
 		return "Unable to process playlist."
 	}
-
-	println(info_playlist)
 	if info_playlist.video_info.len == 0 {
 		return "This playlist is empty."
 	}
-	// TODO(franksodre): make the file format dynamic [vtt, srt, ass]
-	filepaths := os.glob('${info_playlist.path}*.vtt') or {
+
+	// The filtering is almost always unnecessary.
+	// The dir will always have the spected format.
+
+	// filepaths := os.ls(info_playlist.path) or {
+	// 	eprintln(err)
+	// 	return "There are no subs for this video."
+	// }.filter(os.file_ext(it) == '.' + info_playlist.video_format)
+	filepaths := os.glob('${info_playlist.path}*.${info_playlist.video_format}') or {
 		eprintln(err)
 		return "There are no subs for this video."
 	}
+
 	if filepaths.len == 0 {
 		return "There are no subs for this video."
 	}
@@ -66,33 +78,33 @@ fn render_sub_info_playlist(info_playlist InfoPlaylist) string {
 	for k, path in filepaths {
 		// yeah, still don't love it.
 		title := get_filename(path)
-		encoded := base64.url_encode_str(os.file_name(path))
 		base_dir := os.dir(path).split('/').last()
-		video_url := info_playlist.video_info[k].url
+		url := info_playlist.video_info[k].url
+		encoded := base64.url_encode_str(os.file_name(path))
 
 		s += '<div><a href="download/sub?d=${base_dir}&name=${encoded}"
 		download="${os.file_name(path)} "class="font-medium hover:underline">${title}</a></div>'
 		s += '<div class="bg-red-600 rounded w-fit p-2 mt-2"><a
-		href="${video_url}" class="font-bold text-white"
+		href="${url}" class="font-bold text-white"
 		target="_blank">Youtube</a></div><br>'
 	}
 	return s
 }
 
-// TODO(franksodre): remove reverse calls
-// returns the filename without it's extension
-fn get_filename(filename string) string {
-	mut count := 0
-	mut s := ""
-	title := os.file_name(filename)
-	for k, c in title.reverse() {
-		if c == `.` {
-			count++
-			if count == 2 {
-				s = title.reverse()[k..]
-				break;
-			}
-		}
-	}
-	return s.reverse()
+fn (r Render) display_error(err IError) string {
+	return '<div id="error" class="text-red-400 font-semibold">${err.msg()}</div>'
+}
+
+fn (r Render) display_error_string(err string) string {
+	return '<div id="error" class="text-red-400 font-semibold">${err}</div>'
+}
+
+fn (r Render) display_warn(err IError) string {
+	return "<div class='text-amber-500 font-medium'><span class='bg-amber-300
+	text-white font-bold px-2 rounded mr-2'>!</span>${err.msg()}</div>"
+}
+
+fn (r Render) display_warn_string(err string) string {
+	return "<div class='text-amber-500 font-medium'><span class='bg-amber-300
+	text-white font-bold px-2 rounded mr-2'>!</span>${err}</div>"
 }
