@@ -51,7 +51,7 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	eprintln(err)
 	// TOOD(franksodre): put errors in a kind of global context so it can be used by Render to display it.
 	// for now we just print it.
-	println('Downloading: ${watch.elapsed().str()}')
+	println('Downloading: ${watch.elapsed()}')
 
 	info_playlist.first().path = path
 	info_playlist.first().video_format = format
