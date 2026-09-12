@@ -24,14 +24,13 @@ fn render_sub_info(info Info) string {
 		return "There are no subs for this video."
 	}
 
-	pattern := '${info.path}*.${info.format}'
-	filepath := os.glob(pattern) or {
+	pattern := '.' + info.format
+	filepath := os.ls(info.path) or {
 		eprintln(err)
 		return "There are no subs for this video."
-	}
+	}.filter(os.file_ext(it) == pattern)
 
 	if filepath.len == 0 {
-		println(filepath)
 		return "There are no subs for this video."
 	}
 
@@ -62,14 +61,11 @@ fn render_sub_info_playlist(info_playlist InfoPlaylist) string {
 	// The filtering is almost always unnecessary.
 	// The dir will always have the spected format.
 
-	// filepaths := os.ls(info_playlist.path) or {
-	// 	eprintln(err)
-	// 	return "There are no subs for this video."
-	// }.filter(os.file_ext(it) == '.' + info_playlist.video_format)
-	filepaths := os.glob('${info_playlist.path}*.${info_playlist.video_format}') or {
+	pattern := '.' + info_playlist.video_format
+	filepaths := os.ls(info_playlist.path) or {
 		eprintln(err)
 		return "There are no subs for this video."
-	}
+	}.filter(os.file_ext(it) == '.' + info_playlist.video_format)
 
 	if filepaths.len == 0 {
 		return "There are no subs for this video."
