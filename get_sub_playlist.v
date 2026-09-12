@@ -36,7 +36,7 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 		return ctx.html(r.display_error_string("<div id='error'>This Error will get better 2<div>"))
 	}
 
-	println('Info extraction: ${watch.elapsed().str()}')
+	println('Info extraction: ${watch.elapsed()}')
 
 	if info_playlist.len == 0 {
 		return ctx.html(r.display_warn_string("Nothing found. Playlist empty or not visible"))

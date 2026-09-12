@@ -54,7 +54,7 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	watch.start()
 	_, err := ytdlp.download(ytdlp.DownloadParams{ url: url.raw_url, path: path, format: format })
 	eprintln(err) // TODO(franksodre): render it later.
-	println('Downloading: ${watch.elapsed().str()}') // measuring
+	println('Downloading: ${watch.elapsed()}') // measuring
 
 	info.first().path = path
 	info.first().format = format
