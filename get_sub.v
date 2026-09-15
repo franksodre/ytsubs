@@ -1,8 +1,6 @@
-// @disgusting in all the things that disgust me this is the worst and
-// sam altman he really give me the creepies
 module main
 
-import entity { Info }
+import entity { Info, SubtitleCache }
 import os
 import time
 import veb
@@ -15,7 +13,6 @@ const video_id_msg = 'cannot get video information. Please check the URL'
 @['/'; post]
 fn (app &App) post(mut ctx Context) veb.Result {
 	mut watch := time.new_stopwatch()
-
 	r := new_render()
 
 	format := ctx.form['format']
@@ -31,34 +28,43 @@ fn (app &App) post(mut ctx Context) veb.Result {
 		return app.post_playlist(mut ctx)
 	}
 
-	id := url.get_video_id() or {
+	video_id := url.get_video_id() or {
 		eprintln(err)
 		return ctx.request_error(video_id_msg)
 	}
-	mut item, ok := app.cache().get_item[Info](id, format)
 
-	// this is a temporary fix
-	if ok && !os.is_dir_empty(item.path) {
-		return ctx.html(r.display(item))
+	cache := app.cache()
+	if item := cache.find_video(video_id, format) {
+		if !os.is_dir_empty(item.path) {
+			info := ytdlp.extract_info(url.raw_url) or {
+				return ctx.html(r.display_error(err))
+			}
+			if info.len > 0 {
+				return ctx.html(r.display(info.first(), item))
+			}
+		}
 	}
 
 	path := create_save_dir()
 	info := ytdlp.extract_info(url.raw_url) or {
-		eprintln(err)
+		 eprintln(err)
 		return ctx.html(r.display_error(err))
 	}
 	if info.len == 0 {
-		return ctx.html(r.display_warn_string("Nothing found. Video doesn't exits or Private"))
+		return ctx.html(r.display_warn_string("Nothing found. Video doesn't exist or is private"))
 	}
 
 	watch.start()
-	_, err := ytdlp.download(ytdlp.DownloadParams{ url: url.raw_url, path: path, format: format })
-	eprintln(err) // TODO(franksodre): render it later.
-	println('Downloading: ${watch.elapsed()}') // measuring
+	_, err := ytdlp.download(ytdlp.DownloadParams{url: url.raw_url, path: path, format: format})
+	eprintln(err)
+	println('Downloading: ${watch.elapsed()}')
 
-	info.first().path = path
-	info.first().format = format
-	app.cache().add_item[Info](id, format, info.first()) or { eprintln(err) }
+	item := SubtitleCache{
+		video_id: video_id
+		format: format
+		path: path
+	}
+	cache.save_video(item) or { eprintln(err) }
 
-	return ctx.html(r.display(info.first()))
+	return ctx.html(r.display(info.first(), item))
 }
