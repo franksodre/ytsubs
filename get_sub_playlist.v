@@ -1,11 +1,11 @@
 module main
 
+import entity { InfoPlaylist, PlaylistSubtitleCache }
+import os
+import time
 import veb
 import ytdlp
-import os
 import ytdlp.urlparser as u
-import entity { InfoPlaylist, Info }
-import time
 
 fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	mut watch := time.new_stopwatch()
@@ -15,25 +15,30 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 	raw_url := ctx.form['url'] or { return ctx.request_error(is_valid_url_msg) }
 
 	url := u.parse_url(raw_url) or {
-		eprintln(err)
 		return ctx.html(r.display_error(err))
 	}
 
-	// @known get_playlist_id also check if it's a playlist
-	id := url.get_playlist_id() or {
+	playlist_id := url.get_playlist_id() or {
 		return ctx.request_error(r.display_error(err))
 	}
 
-	mut item, ok := app.cache().get_item[InfoPlaylist](id, format)
-	if ok && !os.is_dir_empty(item.path) {
-		return ctx.html(r.display(item))
+	cache := app.cache()
+	if item := cache.find_playlist(playlist_id, format) {
+		if !os.is_dir_empty(item.path) {
+			info := ytdlp.extract_playlist_info(url.raw_url) or {
+				return ctx.html(r.display_error(err))
+			}
+			if info.len > 0 {
+				return ctx.html(r.display_playlist(info.first(), item))
+			}
+		}
 	}
 
 	path := create_save_dir()
 	watch.start()
-	mut info_playlist := ytdlp.extract_playlist_info(url.raw_url) or {
+	info_playlist := ytdlp.extract_playlist_info(url.raw_url) or {
 		eprintln(err)
-		return ctx.html(r.display_error_string("<div id='error'>This Error will get better 2<div>"))
+		return ctx.html(r.display_error(err))
 	}
 
 	println('Info extraction: ${watch.elapsed()}')
@@ -49,13 +54,14 @@ fn (app &App) post_playlist(mut ctx Context) veb.Result {
 		path: path
 	})
 	eprintln(err)
-	// TOOD(franksodre): put errors in a kind of global context so it can be used by Render to display it.
-	// for now we just print it.
 	println('Downloading: ${watch.elapsed()}')
 
-	info_playlist.first().path = path
-	info_playlist.first().video_format = format
-	app.cache().add_item[InfoPlaylist](id, format, info_playlist.first()) or { eprintln(err) }
+	item := PlaylistSubtitleCache{
+		playlist_id: playlist_id
+		format: format
+		path: path
+	}
+	cache.save_playlist(item) or { eprintln(err) }
 
-	return ctx.html(r.display(info_playlist.first()))
+	return ctx.html(r.display_playlist(info_playlist.first(), item))
 }
