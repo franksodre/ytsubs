@@ -10,6 +10,16 @@ import ytdlp.urlparser as u
 const is_valid_url_msg = 'field URL cannot be empty. Please enter a valid YT URL'
 const video_id_msg = 'cannot get video information. Please check the URL'
 
+fn info_from_cache(item SubtitleCache) Info {
+	return Info{
+		videoid: item.video_id
+		title: item.title
+		duration: item.duration
+		url: item.url
+		language: item.language
+	}
+}
+
 @['/'; post]
 fn (app &App) post(mut ctx Context) veb.Result {
 	mut watch := time.new_stopwatch()
@@ -36,18 +46,13 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	cache := app.cache()
 	if item := cache.find_video(video_id, format) {
 		if !os.is_dir_empty(item.path) {
-			info := ytdlp.extract_info(url.raw_url) or {
-				return ctx.html(r.display_error(err))
-			}
-			if info.len > 0 {
-				return ctx.html(r.display(info.first(), item))
-			}
+			return ctx.html(r.display(info_from_cache(item), item))
 		}
 	}
 
 	path := create_save_dir()
 	info := ytdlp.extract_info(url.raw_url) or {
-		 eprintln(err)
+		eprintln(err)
 		return ctx.html(r.display_error(err))
 	}
 	if info.len == 0 {
@@ -59,12 +64,17 @@ fn (app &App) post(mut ctx Context) veb.Result {
 	eprintln(err)
 	println('Downloading: ${watch.elapsed()}')
 
+	video := info.first()
 	item := SubtitleCache{
-		video_id: video_id
+		video_id: video.videoid
+		title: video.title
+		duration: video.duration
+		url: video.url
+		language: video.language
 		format: format
 		path: path
 	}
 	cache.save_video(item) or { eprintln(err) }
 
-	return ctx.html(r.display(info.first(), item))
+	return ctx.html(r.display(video, item))
 }
