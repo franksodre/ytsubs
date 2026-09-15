@@ -1,28 +1,36 @@
 module entity
 
-@[json: 'Info'; table: 'Info']
 pub struct Info {
 pub:
-	id        int @[primary; sql: serial; json: '-']
-	parent_id int
-	videoid   string @[json: 'id']
+	videoid   string
 	title     string
 	duration  string
 	url       string
 	language  string
-pub mut:
-	path   string
-	format string
 }
 
-@[json: 'InfoPlaylist'; table: 'InfoPlaylist']
 pub struct InfoPlaylist {
 pub:
-	id             int @[primary; sql: serial; json: '-']
-	playlist_id    string @[json: 'playlist_id']
+	playlist_id    string
 	playlist_title string
-	video_info     []Info @[fkey: 'parent_id'; json: 'video']
-pub mut:
-	path         string
-	video_format string
+	video_info     []Info
+}
+
+// SubtitleCache contains application state about a downloaded subtitle.
+// It deliberately does not belong to Info: path and format describe our
+// cached artifact, not the YouTube video itself.
+pub struct SubtitleCache {
+pub:
+	id        int
+	video_id  string
+	format    string
+	path      string
+}
+
+pub struct PlaylistSubtitleCache {
+pub:
+	id          int
+	playlist_id string
+	format      string
+	path        string
 }
