@@ -16,14 +16,17 @@ pub:
 	video_info     []Info
 }
 
-// SubtitleCache contains application state about a downloaded subtitle.
-// It deliberately does not belong to Info: path and format describe our
-// cached artifact, not the YouTube video itself.
+// SubtitleCache is the persisted representation of a downloadable video.
+// Download-specific state stays here instead of leaking into Info.
 @[table: 'SubtitleCache']
 pub struct SubtitleCache {
 pub:
 	id        int @[primary; sql: serial]
 	video_id  string
+	title     string
+	duration  string
+	url       string
+	language  string
 	format    string
 	path      string
 }
