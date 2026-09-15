@@ -18,10 +18,10 @@ pub fn migrate(db orm.Connection) ! {
 	}!
 }
 
-pub fn (r Repository) lookup_video(video_id string, format string) ?SubtitleCache {
+pub fn (r Repository) lookup_video(q_video_id string, q_format string) ?SubtitleCache {
 	rows := sql r.db {
 		select from SubtitleCache
-		where video_id == video_id && format == format
+		where video_id == q_video_id && format == q_format
 		order by id desc
 		limit 1
 	} or { return none }
@@ -29,10 +29,10 @@ pub fn (r Repository) lookup_video(video_id string, format string) ?SubtitleCach
 	return rows[0] or { none }
 }
 
-pub fn (r Repository) lookup_playlist(playlist_id string, format string) ?PlaylistSubtitleCache {
+pub fn (r Repository) lookup_playlist(q_playlist_id string, q_format string) ?PlaylistSubtitleCache {
 	rows := sql r.db {
 		select from PlaylistSubtitleCache
-		where playlist_id == playlist_id && format == format
+		where playlist_id == q_playlist_id && format == q_format
 		order by id desc
 		limit 1
 	} or { return none }
