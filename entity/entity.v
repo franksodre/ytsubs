@@ -1,28 +1,41 @@
 module entity
 
-@[json: 'Info'; table: 'Info']
+@[json: 'Info']
 pub struct Info {
 pub:
-	id        int @[primary; sql: serial; json: '-']
-	parent_id int
 	videoid   string @[json: 'id']
 	title     string
 	duration  string
 	url       string
 	language  string
-pub mut:
-	path   string
-	format string
 }
 
-@[json: 'InfoPlaylist'; table: 'InfoPlaylist']
+@[json: 'InfoPlaylist']
 pub struct InfoPlaylist {
 pub:
-	id             int @[primary; sql: serial; json: '-']
-	playlist_id    string @[json: 'playlist_id']
+	playlist_id    string // this is not being used anywhere
 	playlist_title string
-	video_info     []Info @[fkey: 'parent_id'; json: 'video']
-pub mut:
+	video_info     []Info
+}
+
+@[table: 'SubtitleCache']
+pub struct SubtitleCache {
+pub:
+	id				int @[primary; sql: serial]
+	videoid   string @[json: 'id']
+	title     string
+	duration  string
+	url       string
+	language  string
+	path      string
+	format		string
+}
+
+@[table: 'PlaylistSubtitleCache']
+pub struct PlaylistSubtitleCache {
+pub:
+	id           int @[primary; sql: serial]
+	playlist_id	 string
 	path         string
 	video_format string
 }
