@@ -1,7 +1,7 @@
 module repo
 
 import orm
-import entity {Info, InfoPlaylist}
+import entity { SubtitleCache, PlaylistSubtitleCache }
 
 struct Repository {
 	db 	orm.Connection
@@ -20,42 +20,42 @@ pub fn migrate(db orm.Connection) ! {
 	}!
 }
 
-fn (r Repository) lookup[T] (code string, format string, query fn (orm.Connection, string, string) T) T {
-	return query(r.db, code, format)
-}
+// fn (r Repository) lookup[T] (code string, format string, query fn (orm.Connection, string, string) T) T {
+// 	return query(r.db, code, format)
+// }
 
-fn (r Repository) add_key[T] (item T, query fn (orm.Connection, T) !) ! {
-	return query(r.db, item)
+// fn (r Repository) add_key[T] (item T, query fn (orm.Connection, T) !) ! {
+// 	return query(r.db, item)
+// }
+
+// This can't return an array
+// @known calling first might panic cause the info can be empty
+(r Repository) fn find(id string, sub_format string) ?SubtitleCache {
+	item := sql r.db {
+		select from SubtitleCache where videoid == id && format == sub_format
+		order by id desc limit 1
+	} or { none }
+	return item[0] or { none }
 }
 
 // This can't return an array
-// @known calling first might panic cause the info can be empty 
-fn lookup_info(db orm.Connection, id string, sub_format string) Info {
-	info := sql db {
-		select from Info where videoid == id && format == sub_format
+// @known calling first might panic cause the info can be empty
+fn (r Repository) find_playlist(id string, sub_format string) ?PlaylistSubtitleCache {
+	item := sql r.db {
+		select from PlaylistSubtitleCache where playlist_id == id && video_format == sub_format
 		order by id desc limit 1
-	} or { [] }
-	return info[0] or { Info{} }
+	} or { none }
+	return item[0] or { none }
 }
 
-// This can't return an array
-// @known calling first might panic cause the info can be empty 
-fn lookup_info_playlist(db orm.Connection, id string, sub_format string) InfoPlaylist {
-	info := sql db {
-		select from InfoPlaylist where playlist_id == id && video_format == sub_format
-		order by id desc limit 1
-	} or { [] }
-	return info[0] or { InfoPlaylist{} }
-}
-
-fn add_key_info(db orm.Connection, item Info) ! {
-	sql db {
-		insert item into Info
+(r Repository) fn save(item SubtitleCache) ! {
+	sql r.db {
+		insert item into SubtitleCache
 	}!
 }
 
-fn add_key_playlist(db orm.Connection, item InfoPlaylist) ! {
-	sql db {
-		insert item into InfoPlaylist
+(r Repository) fn save_playlist(item PlaylistSubtitleCache) ! {
+	sql r.db {
+		insert item into PlaylistSubtitleCache
 	}!
 }
