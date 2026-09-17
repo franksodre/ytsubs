@@ -1,4 +1,5 @@
 module repo
+
 import entity { SubtitleCache, PlaylistSubtitleCache }
 
 pub struct UseCase {

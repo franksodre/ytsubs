@@ -39,7 +39,7 @@ fn (r Repository) find_playlist(video_id string, sub_format string) ?PlaylistSub
 	return item[0] or { return none }
 }
 
-fn (r Repository) save(item SubtitleCache) ! {
+fn (r Repository) save_video(item SubtitleCache) ! {
 	sql r.db {
 		insert item into SubtitleCache
 	}!
