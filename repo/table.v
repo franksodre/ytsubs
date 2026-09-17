@@ -15,8 +15,8 @@ pub fn new_repo(db orm.Connection) Repository {
 
 pub fn migrate(db orm.Connection) ! {
 	sql db {
-		create table Info
-		create table InfoPlaylist
+		create table SubtitleCache
+		create table PlaylistSubtitleCache
 	}!
 }
 
