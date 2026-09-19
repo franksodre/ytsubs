@@ -2,7 +2,7 @@
 // sam altman he really give me the creepies
 module main
 
-import entity { Info }
+import entity { Info, SubtitleCache }
 import os
 import time
 import veb
@@ -35,11 +35,11 @@ fn (app &App) post(mut ctx Context) veb.Result {
 		eprintln(err)
 		return ctx.request_error(video_id_msg)
 	}
-	mut item, ok := app.cache().get_item[Info](id, format)
-
-	// this is a temporary fix
-	if ok && !os.is_dir_empty(item.path) {
-		return ctx.html(r.display(item))
+	cache := app.cache()
+	if item := cache.find_video(id, format) {
+		if !os.is_dir_empty(item.path) {
+			return ctx.html(r.display())
+		}
 	}
 
 	path := create_save_dir()
@@ -58,7 +58,7 @@ fn (app &App) post(mut ctx Context) veb.Result {
 
 	info.first().path = path
 	info.first().format = format
-	app.cache().add_item[Info](id, format, info.first()) or { eprintln(err) }
+	cache.save_video(id, format, info.first()) or { eprintln(err) }
 
 	return ctx.html(r.display(info.first()))
 }
