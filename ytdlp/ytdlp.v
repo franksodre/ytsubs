@@ -4,36 +4,37 @@ import json2 as j2
 import entity
 
 pub enum ErrorType {
-	some_failed
 	all_failed
-	succeeded
 	no_subs_available
-	none
+}
+
+@[params]
+pub struct ParserError {
+pub:
+	type 		ErrorType
+	value 	string
+	context string
 }
 
 // TODO(franksodre): Data not Metadata
 
 pub fn extract_info(url string) ![]entity.Info {
-	info := extract_info_cmd(url)!
+	info := extract_info_cmd(url)
 	infojson := j2.decode[[]entity.Info](info)!
 	return infojson
 }
 
 pub fn extract_playlist_info(url string) ![]entity.InfoPlaylist {
-	info := extract_info_playlist_cmd(url)!
+	info := extract_info_playlist_cmd(url)
 	infojson := j2.decode[[]entity.InfoPlaylist](info)!
 	return infojson
 }
 
 // returns succeeded generated subs metadata and failed ones
-pub fn download(params DownloadParams) ([]ErrorType, []string) {
+pub fn download(params DownloadParams) []ParserError {
 	result := download_cmd(params)
-	if result.exit_code != 0 {
-		return parse_output_result(result.output)
-	}
-	// for no_subs_available case -- There has to be a better way
-	println(parse_output_result(result.output))
-	return []ErrorType{}, []string{}
+	// if result.exit_code != 0
+	return parse_output_result(result.output)
 }
 
 // if we have [download] Destination
@@ -41,36 +42,33 @@ pub fn download(params DownloadParams) ([]ErrorType, []string) {
 // if we have ERROR: [youtube] _id_:
 
 // @known Maybe return all the states too
-fn parse_output_result(output string) ([]ErrorType, []string) {
+fn parse_output_result(output string) []ParserError {
 	lines := output.split_into_lines()
-	mut msg := []string{}
-	mut states := []ErrorType{}
+	mut err := []ParserError{}
+	mut url := ""
 	for line in lines {
+		if line.starts_with('[youtube:tab] Extracting URL:') ||
+			line.starts_with('[youtube] Extracting URL:') {
+			url = line.all_after_first(']').all_after_first(':').trim(' ')
+		}
 		if line.starts_with('[info] There are no subtitles for the requested languages') {
-			// video_id := lines[i-1].all_before(':').all_after(' ')
-			states << .no_subs_available
-			msg << 'There are no subtitles for the requested languages'
+			err << ParserError{
+				type: .no_subs_available, 
+				value: url, 
+				context: 'There are no subtitles for the requested languages'
+			}
 			continue
 		}
-		if line.starts_with('[download] Destination:') {
-			states << .succeeded
-			continue
-		}
-		if line.starts_with('[info]: Writing video subtitles to:') {
-			states << .succeeded
-			continue
-		}
-		// if the same error repeats count it and show it alongside with the count
 		if line.starts_with('ERROR: [youtube]') {
-			msg << line.all_after_last(':')
-			// @known not simple as that. At this point we better create a really simple states machine.
-			if ErrorType.succeeded in states {
-				states << .some_failed
+			if err.len > 0 {
 				continue
 			}
-			states << .all_failed
+			msg := line.all_after_last(':')
+			err << ParserError{
+				type: .all_failed
+				context: msg
+			}
 		}
 	}
-	println(lines)
-	return states, msg
+	return err
 }

@@ -1,0 +1,63 @@
+ <article class="mt-8 overflow-hidden rounded-xl border
+	border-zinc-200 bg-white"> <div class="flex">
+
+		<a href="${info.url}" target="_blank" class="relative w-64 shrink-0
+		overflow-hidden bg-zinc-100" > <img
+		src="https://i.ytimg.com/vi/${info.videoid}/hqdefault.jpg" alt=""
+		class="h-full w-full object-cover" >
+
+		<span class="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1
+		text-xs font-medium text-white" > ${info.duration} </span> </a>
+
+		<div class="flex min-w-0 flex-1 flex-col p-5">
+
+		<div class="flex-1">
+
+		<div class="mb-2 flex items-center gap-2 text-xs font-medium uppercase
+		tracking-wider text-zinc-400"> <span>YouTube</span> <span>/</span>
+		<span>${info.language}</span> </div>
+
+		<h2 class="line-clamp-2 text-lg font-semibold tracking-tight">
+		${info.title} </h2>
+
+		</div>
+
+		<div class="mt-5 flex items-center justify-between">
+
+		<a href="${info.url}" target="_blank" class="text-sm text-zinc-500
+		hover:text-zinc-900" > Open video ↗ </a>
+
+    @if cache.filepath != '' && cache.encoded != ''
+      <a download="${cache.filepath}" href="download/sub?name=${cache.encoded}"
+      class="rounded-lg bg-zinc-950 px-4 py-2 text-sm font-medium text-white
+      hover:bg-zinc-800" > Download </a>
+    @end
+
+		</div>
+
+		</div> </div> 
+
+    <!-- if error -->
+    @if errors.len != 0
+      @for err in errors
+        <div class="mt-8 overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <a
+            href="https://youtube.com/watch?v=${err.value}"
+            target="_blank"
+            class="relative w-64 shrink-0 overflow-hidden bg-zinc-100"
+          >
+          <img
+            src="https://i.ytimg.com/vi/${err.value}/hqdefault.jpg"
+            alt=""
+            class="h-[100px] w-[100px] object-cover"
+          />
+          </a>
+          <div class="text-amber-500 font-medium">
+            <span class="bg-amber-300 text-white font-bold px-2 rounded
+            mr-2">!</span>
+            ${err.context}
+          </div>
+        </div>
+      @end
+    @end
+ </article> 

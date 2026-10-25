@@ -1,64 +1,102 @@
-// @disgusting in all the things that disgust me this is the worst and
-// sam altman he really give me the creepies
 module main
 
-import entity { Info }
+import entity { Info, SubtitleCache }
 import os
-import time
 import veb
 import ytdlp
 import ytdlp.urlparser as u
 
-const is_valid_url_msg = 'field URL cannot be empty. Please enter a valid YT URL'
-const video_id_msg = 'cannot get video information. Please check the URL'
+import encoding.base64
+
+
+fn info_to_subtitle_cache(info Info, path string, format string) SubtitleCache {
+	item := SubtitleCache {
+		video_id: info.videoid
+		title: info.title
+		duration: info.duration
+		url: info.url
+		language: info.language
+		format: format
+		path: path
+	}
+	return item
+}
 
 @['/'; post]
 fn (app &App) post(mut ctx Context) veb.Result {
-	mut watch := time.new_stopwatch()
-
-	r := new_render()
-
 	format := ctx.form['format']
-	raw_url := ctx.form['url'] or {
-		return ctx.request_error(is_valid_url_msg)
-	}
+	raw_url := ctx.form['url'] or { return ctx.request_error('Please submit a url!') }
 
 	url := u.parse_url(raw_url) or {
-		return ctx.html(r.display_error(err))
+		// ctx.res.set_status()
+		eprintln(err)
+		return ctx.request_error('URL malformed!')
 	}
 
+	// @maybe: use redirect instead
 	if url.is_playlist() {
 		return app.post_playlist(mut ctx)
 	}
 
 	id := url.get_video_id() or {
 		eprintln(err)
-		return ctx.request_error(video_id_msg)
-	}
-	mut item, ok := app.cache().get_item[Info](id, format)
-
-	// this is a temporary fix
-	if ok && !os.is_dir_empty(item.path) {
-		return ctx.html(r.display(item))
+		return ctx.request_error(err.msg())
 	}
 
-	path := create_save_dir()
-	info := ytdlp.extract_info(url.raw_url) or {
+	// I would prefer this to be after the `find_video`
+	info_json := ytdlp.extract_info(url.raw_url) or {
+		// ctx.res.set_status(.internal_sever_error)
 		eprintln(err)
-		return ctx.html(r.display_error(err))
-	}
-	if info.len == 0 {
-		return ctx.html(r.display_warn_string("Nothing found. Video doesn't exits or Private"))
+		return ctx.server_error('Something wrong as happened, try again later!')
 	}
 
-	watch.start()
-	_, err := ytdlp.download(ytdlp.DownloadParams{ url: url.raw_url, path: path, format: format })
-	eprintln(err) // TODO(franksodre): render it later.
-	println('Downloading: ${watch.elapsed()}') // measuring
+	info := info_json.first()
+	cached := app.cache().find_video(id, format) or {
+		return download_sub(app, mut ctx, info, format)
+	}
 
-	info.first().path = path
-	info.first().format = format
-	app.cache().add_item[Info](id, format, info.first()) or { eprintln(err) }
+	if os.is_dir_empty(cached.path) {
+		eprintln('on is_dir_empty::cached.path == `${cached.path}`')
+		return ctx.text('Nothing to render!')
+	}
 
-	return ctx.html(r.display(info.first()))
+
+	// todo: get rid of this repetition
+	ext := '.' + format
+	paths := os.ls(cached.path) or { eprintln(err); exit(1) }.filter(os.file_ext(it) == ext)
+	filename := paths.map(it).last()
+
+	filepath := get_filepath_from_path(cached.path, filename)
+	path_encoded := base64.url_encode_str(filepath)
+
+	cache := struct {filepath: get_filename(filename), encoded: path_encoded}
+	errors := []ytdlp.ParserError{}
+
+	// use redirects in post
+	return $veb.html('./templates/partials/results.html')
+}
+
+// Don't like it but it's ok for now
+fn download_sub(app &App, mut ctx Context, info Info, format string) veb.Result {
+	// this could somehow fail?
+	path := create_save_dir()
+
+	errors := ytdlp.download(url: info.url, format: format, path: path)
+	if errors.len == 0 {
+		subtitle := info_to_subtitle_cache(info, path, format)
+		app.cache().save_video(subtitle) or { panic('unimplemented') }
+	}
+
+	// todo: use UUIDs and lookup in the db instead of base64
+
+	// This is not accurate by all means but it WORKS.
+	ext := '.' + format
+	paths := os.ls(path) or { eprintln(err); exit(1) }.filter(os.file_ext(it) == ext)
+	filename := paths.map(it).last()
+
+	filepath := get_filepath_from_path(path, filename)
+	path_encoded := base64.url_encode_str(filepath)
+
+	cache := struct {filepath: get_filename(filename), encoded: path_encoded}
+	return $veb.html('./templates/partials/results.html')
 }

@@ -10,3 +10,4 @@ pub const port = 8080
 
 pub const metafile = workdir + separator + "metafile.json"
 pub const cookies = workdir + "/assets/cookies.txt"
+pub const db_url = workdir + '/migration/lookup.db'

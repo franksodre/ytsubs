@@ -26,3 +26,10 @@ fn get_filename(filename string) string {
 	}
 	return s.reverse()
 }
+
+// path should probably be renamed to filename or something but it's 3:36 and I'm tired.
+fn get_filepath_from_path(path string, filename string) string {
+	base_dir := os.dir(path).split('/').last()
+	filepath := os.join_path_single(base_dir, filename)
+	return filepath
+}
